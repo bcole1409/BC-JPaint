@@ -47,9 +47,15 @@ public class JPaintController implements IJPaintController {
         uiModule.addEvent(EventName.CHOOSE_MOUSE_MODE, () -> applicationState.setActiveStartAndEndPointMode()); //LAMBDA function is an anonymous function
         uiModule.addEvent(EventName.UNDO, () -> UndoButtonHandler());
         uiModule.addEvent(EventName.REDO, () -> RedoButtonHandler());
+
     }
 
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
+        handleMouseModeDraw(pressedPoint, releasedPoint);
+        handleMouseModeSelect(pressedPoint, releasedPoint);
+    }
+
+    public void handleMouseModeDraw(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.DRAW){
             if(applicationState.getActiveShapeType() == ShapeType.RECTANGLE){
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
@@ -75,6 +81,20 @@ public class JPaintController implements IJPaintController {
         }
     }
 
+    public void handleMouseModeSelect(Point pressedPoint, Point releasedPoint){
+        if(applicationState.getActiveMouseMode() == MouseMode.SELECT){
+            ShapeCommand testShape = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
+                    applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
+            System.out.println("minX " + pressedPoint.x + "minY " + pressedPoint.y + "maxX " + releasedPoint.x + "maxY " + releasedPoint.y);
+            for(int x = 0; x < 500; x+=10){
+                for(int y = 0; y < 500; y+=10){
+                    testShape.didCollideWithMe(x,y);
+                }
+            }
+            //20 lines of code
+        }
+    }
+
     private void UndoButtonHandler(){
         resetCanvas();
         myCommandHistory.undo();
@@ -90,8 +110,15 @@ public class JPaintController implements IJPaintController {
         resetCanvas();
         myCommandHistory.redo();
         //REMOVE LAST SHAPE
-
         redraw();
+    }
+
+    //ADDED
+    private void SelectButtonHandler(){
+        //call function
+        //if function returns empty array do nothing
+        //else
+
     }
 
     private void resetCanvas(){

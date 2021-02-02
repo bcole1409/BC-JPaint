@@ -43,21 +43,4 @@ public class DrawRectangleCommand extends ShapeCommand {
         }
 
     }
-
-    private int calcWidth(Point p1, Point p2){
-        int width = Math.abs(p2.x-p1.x);
-        return width;
-    }
-
-    private int calcHeight(Point p1, Point p2){
-        int height = Math.abs(p2.y-p1.y);
-        return height;
-    }
-
-    private Point calcTopLeftCorner(Point p1, Point p2){
-        int x = Math.min(p1.x, p2.x);
-        int y = Math.min(p1.y, p2.y);
-        Point topLeft = new Point(x,y);
-        return topLeft;
-    }
 }
