@@ -4,9 +4,7 @@ import model.*;
 import model.Point;
 import model.interfaces.IApplicationState;
 import model.interfaces.IShape;
-import model.interfaces.IUndoable;
 import view.EventName;
-import view.gui.PaintCanvas;
 import view.interfaces.IUiModule;
 import view.interfaces.PaintCanvasBase;
 import model.CommandHistory;
@@ -20,9 +18,9 @@ public class JPaintController implements IJPaintController {
     private final PaintCanvasBase paintCanvas;
     private final CommandHistory myCommandHistory;
 
-    //new
     //the list of shapes that are currently visible on screen
     private final ArrayList<IShape> drawList;
+    private ArrayList<ShapeCommand> selectedShapesList;
 
     public JPaintController(IUiModule uiModule, IApplicationState applicationState, PaintCanvasBase MyPaintCanvas) {
         this.uiModule = uiModule;
@@ -31,6 +29,7 @@ public class JPaintController implements IJPaintController {
 
         //new
         this.drawList = new ArrayList<IShape>();
+        this.selectedShapesList = new ArrayList<ShapeCommand>();
         this.myCommandHistory = new CommandHistory();
     }
 
@@ -47,7 +46,6 @@ public class JPaintController implements IJPaintController {
         uiModule.addEvent(EventName.CHOOSE_MOUSE_MODE, () -> applicationState.setActiveStartAndEndPointMode()); //LAMBDA function is an anonymous function
         uiModule.addEvent(EventName.UNDO, () -> UndoButtonHandler());
         uiModule.addEvent(EventName.REDO, () -> RedoButtonHandler());
-
     }
 
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
@@ -83,15 +81,32 @@ public class JPaintController implements IJPaintController {
 
     public void handleMouseModeSelect(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.SELECT){
-            ShapeCommand testShape = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
-                    applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
-            System.out.println("minX " + pressedPoint.x + "minY " + pressedPoint.y + "maxX " + releasedPoint.x + "maxY " + releasedPoint.y);
-            for(int x = 0; x < 500; x+=10){
-                for(int y = 0; y < 500; y+=10){
-                    testShape.didCollideWithMe(x,y);
+            this.selectedShapesList = new ArrayList<ShapeCommand>(); //everytime user selects we clear the selection list
+            ArrayList<ShapeCommand> unselectedShapes = (ArrayList<ShapeCommand>)drawList.clone(); //clone of drawList
+
+            Point topLeftCorner = BoundsUtility.calcTopLeftCorner(pressedPoint, releasedPoint);
+            int width = BoundsUtility.calcWidth(pressedPoint, releasedPoint);
+            int height = BoundsUtility.calcHeight(pressedPoint, releasedPoint);
+
+            for(int x = topLeftCorner.x; x <= topLeftCorner.x + width; x++){
+                for(int y = topLeftCorner.y; y <= topLeftCorner.y + height; y++){
+
+                    ArrayList<ShapeCommand> tempUnselectShapes = new ArrayList<ShapeCommand>();
+                    for (ShapeCommand myShape : unselectedShapes)
+                    {
+                        if(myShape.didCollideWithMe(x,y)){
+                            selectedShapesList.add(myShape);
+                            myShape.debugGotSelected();
+                        }
+                        else{
+                            tempUnselectShapes.add(myShape);
+                        }
+                    }
+                    //
+                    unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
                 }
             }
-            //20 lines of code
+            System.out.println(selectedShapesList.size() + " Shapes Currently selected");
         }
     }
 

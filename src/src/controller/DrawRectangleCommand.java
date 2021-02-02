@@ -22,10 +22,10 @@ public class DrawRectangleCommand extends ShapeCommand {
     public void drawMe() {
         //safe way to extend
         super.drawMe();
-        int width = calcWidth(p1, p2);
-        int height = calcHeight(p1, p2);
+        int width = BoundsUtility.calcWidth(p1, p2);
+        int height = BoundsUtility.calcHeight(p1, p2);
 
-        Point TopLeft = calcTopLeftCorner(p1,p2);
+        Point TopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
         super.setActiveColor(myGraphics2D, primaryColor);
 
         if(sShadingType == ShapeShadingType.FILLED_IN){

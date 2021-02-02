@@ -23,7 +23,7 @@ public class DrawTriangleCommand extends ShapeCommand {
     public void drawMe() {
         //safe way to extend
         super.drawMe();
-        int height = calcHeight(p1, p2);
+        int height = BoundsUtility.calcHeight(p1, p2);
 
         super.setActiveColor(myGraphics2D, primaryColor);
 
@@ -43,15 +43,15 @@ public class DrawTriangleCommand extends ShapeCommand {
     }
 
     private int[] calcXPoints(){
-        Point TopLeft = calcTopLeftCorner(p1,p2);
-        int width = calcWidth(p1, p2);
+        Point TopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
+        int width = BoundsUtility.calcWidth(p1, p2);
         int[] answer = {TopLeft.x, TopLeft.x + width, TopLeft.x + width};
         return answer;
     }
 
     private int[] calcYPoints(){
-        Point TopLeft = calcTopLeftCorner(p1,p2);
-        int height = calcHeight(p1, p2);
+        Point TopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
+        int height = BoundsUtility.calcHeight(p1, p2);
         int[] answer = {TopLeft.y, TopLeft.y, TopLeft.y + height};
         return answer;
     }
