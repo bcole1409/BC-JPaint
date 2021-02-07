@@ -13,6 +13,17 @@ public class BoundsUtility  {
         return height;
     }
 
+    public static int calcDeltaX(Point startingPoint, Point endingPoint){
+        int deltaX = endingPoint.x - startingPoint.x;
+        return deltaX;
+    }
+
+    public static int calcDeltaY(Point startingPoint, Point endingPoint){
+        int deltaY = endingPoint.y - startingPoint.y;
+        return deltaY;
+    }
+
+
     //p1 p2 should be pressed and released points
     public static Point calcTopLeftCorner(Point p1, Point p2){
         int x = Math.min(p1.x, p2.x);

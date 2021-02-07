@@ -113,48 +113,74 @@ public class JPaintController implements IJPaintController {
         }
     }
 
-    //ADDED CODE
     public void handleMouseModeMove(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
             //working with one shape now
-            if(selectedShapesList.size() != 0){
-                ShapeCommand mySelectedShape = selectedShapesList.get(0);
-                MoveCommand myMC = new MoveCommand(pressedPoint,releasedPoint, mySelectedShape);
-                myCommandHistory.add(myMC);
+            if(selectedShapesList.size() != 0) {
+                ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
 
-                //Find the shape we are trying to move in the drawList and Remove
-                //empty drawlist iterate through and add every shape to temp drawlist unless it matches
-                ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
-                for(IShape myShape : drawList){
-                    //TYPES ISSUES
-                    if((IShape)mySelectedShape != myShape){
-                        tempDrawList.add(myShape);
+                for(ShapeCommand mySelectedShape : selectedShapesList) {
+                    //ShapeCommand mySelectedShape = selectedShapesList.get(0);
+
+                    MoveCommand myMC = new MoveCommand(pressedPoint, releasedPoint, mySelectedShape);
+                    myCommandHistory.add(myMC);
+
+                    //Find the shape we are trying to move in the drawList and Remove
+                    //empty drawlist iterate through and add every shape to temp drawlist unless it matches
+                    ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
+
+                    for (IShape myShape : drawList) {
+                        if ((IShape) mySelectedShape != myShape) { //VALID COMPARISON?
+                            tempDrawList.add(myShape);
+                        }
                     }
+
+                    drawList = (ArrayList<IShape>) tempDrawList.clone();
+                    System.out.println("DrawList size: " + drawList.size());
+
+                    Point origTopLeftCorner = BoundsUtility.calcTopLeftCorner(mySelectedShape.p1, mySelectedShape.p2);
+                    int deltaX = BoundsUtility.calcDeltaX(pressedPoint, releasedPoint);
+                    int deltaY = BoundsUtility.calcDeltaY(pressedPoint, releasedPoint);
+
+                    Point newTopLeftCorner = new Point(origTopLeftCorner.x + deltaX, origTopLeftCorner.y + deltaY);
+
+                    int shapeWidth = BoundsUtility.calcWidth(mySelectedShape.p1, mySelectedShape.p2);
+                    int shapeHeight = BoundsUtility.calcHeight(mySelectedShape.p1, mySelectedShape.p2);
+
+                    Point newBottomRightCorner = new Point(newTopLeftCorner.x + shapeWidth, newTopLeftCorner.y + shapeHeight);
+
+                    ShapeCommand shapeInNewPosition = null;
+                    //DrawTriangleCommand mySelectTriangle = (DrawTriangleCommand)mySelectedShape;
+                    if (mySelectedShape instanceof DrawTriangleCommand) {
+                        System.out.println("ITS A TRIANGLE");
+                        shapeInNewPosition = ShapeFactory.getDrawTriangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
+                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
+                    }
+                    if (mySelectedShape instanceof DrawRectangleCommand) {
+                        System.out.println("ITS A RECTANGLE");
+                        shapeInNewPosition = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
+                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
+                    }
+                    if (mySelectedShape instanceof DrawEllipseCommand) {
+                        System.out.println("ITS A ELLIPSE");
+                        shapeInNewPosition = ShapeFactory.getDrawEllipseCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
+                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
+                    }
+
+
+                    drawList.add(shapeInNewPosition);
+                    //selectedShapesList.remove(0);
+                    newSelectedShapesList.add(shapeInNewPosition);
                 }
-
-                drawList = (ArrayList<IShape>)tempDrawList.clone();
-                System.out.println("DrawList size: " + drawList.size());
-                //COMPARE SELECTED TO DRAWLIST
-                //FOR SHAPE IN DRAWLIST
+                selectedShapesList = (ArrayList<ShapeCommand>)newSelectedShapesList.clone();
+                resetCanvas();
+                redraw();
+                //bug4: move multiple shapes at once
             }
-
-
-            //FOR SHAPE IN SELECTLIST
-
-                //IF SHAPE IN DRAWLIST = SHAPEINSELECTED SHAPE
-
-                    //ADD NEW SHAPE TO DRAWLIST
-                    //REMOVE SHAPE FROM DRAWLIST
-
-
-        //somehow need to update moveCommand to command history
-        //RESETCANVAS
-        //REDRAWLIST
-                //don''t know what correct algo is for new top left, but we can find w and h
-                //delta change of releasedpoint.x + width =
-                //delta change releasedpoint.y height =
         }
     }
+
+
 
     private void UndoButtonHandler(){
         resetCanvas();
