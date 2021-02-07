@@ -9,7 +9,6 @@ import view.interfaces.IUiModule;
 import view.interfaces.PaintCanvasBase;
 import model.CommandHistory;
 import java.util.ArrayList;
-
 import java.awt.*;
 
 public class JPaintController implements IJPaintController {
@@ -18,8 +17,9 @@ public class JPaintController implements IJPaintController {
     private final PaintCanvasBase paintCanvas;
     private final CommandHistory myCommandHistory;
 
-    //the list of shapes that are currently visible on screen
-    private final ArrayList<IShape> drawList;
+    //the list of shapes that should be immediately drawn on screen the next instant
+    //any shape movement should update the drawList so that the moved shape is in its final position in the drawList
+    private ArrayList<IShape> drawList;
     private ArrayList<ShapeCommand> selectedShapesList;
 
     public JPaintController(IUiModule uiModule, IApplicationState applicationState, PaintCanvasBase MyPaintCanvas) {
@@ -51,6 +51,7 @@ public class JPaintController implements IJPaintController {
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
         handleMouseModeDraw(pressedPoint, releasedPoint);
         handleMouseModeSelect(pressedPoint, releasedPoint);
+        handleMouseModeMove(pressedPoint, releasedPoint);
     }
 
     public void handleMouseModeDraw(Point pressedPoint, Point releasedPoint){
@@ -81,6 +82,8 @@ public class JPaintController implements IJPaintController {
 
     public void handleMouseModeSelect(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.SELECT){
+            resetCanvas();
+            redraw();
             this.selectedShapesList = new ArrayList<ShapeCommand>(); //everytime user selects we clear the selection list
             ArrayList<ShapeCommand> unselectedShapes = (ArrayList<ShapeCommand>)drawList.clone(); //clone of drawList
 
@@ -90,23 +93,66 @@ public class JPaintController implements IJPaintController {
 
             for(int x = topLeftCorner.x; x <= topLeftCorner.x + width; x++){
                 for(int y = topLeftCorner.y; y <= topLeftCorner.y + height; y++){
-
                     ArrayList<ShapeCommand> tempUnselectShapes = new ArrayList<ShapeCommand>();
                     for (ShapeCommand myShape : unselectedShapes)
                     {
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
                             myShape.debugGotSelected();
+                            //TODO Comment Out
                         }
                         else{
                             tempUnselectShapes.add(myShape);
                         }
                     }
-                    //
                     unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
                 }
             }
+            //TODO Comment Out
             System.out.println(selectedShapesList.size() + " Shapes Currently selected");
+        }
+    }
+
+    //ADDED CODE
+    public void handleMouseModeMove(Point pressedPoint, Point releasedPoint){
+        if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
+            //working with one shape now
+            if(selectedShapesList.size() != 0){
+                ShapeCommand mySelectedShape = selectedShapesList.get(0);
+                MoveCommand myMC = new MoveCommand(pressedPoint,releasedPoint, mySelectedShape);
+                myCommandHistory.add(myMC);
+
+                //Find the shape we are trying to move in the drawList and Remove
+                //empty drawlist iterate through and add every shape to temp drawlist unless it matches
+                ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
+                for(IShape myShape : drawList){
+                    //TYPES ISSUES
+                    if((IShape)mySelectedShape != myShape){
+                        tempDrawList.add(myShape);
+                    }
+                }
+
+                drawList = (ArrayList<IShape>)tempDrawList.clone();
+                System.out.println("DrawList size: " + drawList.size());
+                //COMPARE SELECTED TO DRAWLIST
+                //FOR SHAPE IN DRAWLIST
+            }
+
+
+            //FOR SHAPE IN SELECTLIST
+
+                //IF SHAPE IN DRAWLIST = SHAPEINSELECTED SHAPE
+
+                    //ADD NEW SHAPE TO DRAWLIST
+                    //REMOVE SHAPE FROM DRAWLIST
+
+
+        //somehow need to update moveCommand to command history
+        //RESETCANVAS
+        //REDRAWLIST
+                //don''t know what correct algo is for new top left, but we can find w and h
+                //delta change of releasedpoint.x + width =
+                //delta change releasedpoint.y height =
         }
     }
 
@@ -133,7 +179,6 @@ public class JPaintController implements IJPaintController {
         //call function
         //if function returns empty array do nothing
         //else
-
     }
 
     private void resetCanvas(){

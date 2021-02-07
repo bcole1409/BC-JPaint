@@ -3,7 +3,6 @@ package model;
 import model.interfaces.IShape;
 import model.interfaces.IUndoable;
 import view.interfaces.PaintCanvasBase;
-
 import java.awt.*;
 import java.util.ArrayList;
 

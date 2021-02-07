@@ -41,6 +41,5 @@ public class DrawRectangleCommand extends ShapeCommand {
             myGraphics2D.drawRect(TopLeft.x, TopLeft.y, width, height);
             //X,Y IS THE TOP LEFT CORNER
         }
-
     }
 }

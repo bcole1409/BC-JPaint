@@ -1,7 +1,6 @@
 package controller;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import model.*;
 import model.ShapeCommand;
