@@ -15,7 +15,6 @@ public class CommandHistory {
 		redoStack.clear();
 	}
 
-
 	public static boolean undo() {
 		boolean result = !undoStack.empty();
 		if (result) {
@@ -23,8 +22,6 @@ public class CommandHistory {
 			IUndoable c = undoStack.pop();
 			redoStack.push(c);
 
-			//redo = 2
-			//undo = 1
 			//need to call this, goes to the drawCommand, undo yourself
 			c.undo();
 		}

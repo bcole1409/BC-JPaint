@@ -35,6 +35,11 @@ public abstract class ShapeCommand implements IUndoable,IShape {
 
     @Override
     public void undo() {
+        //REMOVE LAST SHAPE
+        int last = drawList.size();
+        if(last != 0){
+            drawList.remove(last-1);
+        }
     }
 
     public boolean didCollideWithMe(int x, int y){

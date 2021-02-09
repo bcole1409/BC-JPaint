@@ -119,18 +119,16 @@ public class JPaintController implements IJPaintController {
             if(selectedShapesList.size() != 0) {
                 ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
 
+                MoveCommand myMC = new MoveCommand(drawList, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
+                myCommandHistory.add(myMC);
+
                 for(ShapeCommand mySelectedShape : selectedShapesList) {
-                    //ShapeCommand mySelectedShape = selectedShapesList.get(0);
-
-                    MoveCommand myMC = new MoveCommand(pressedPoint, releasedPoint, mySelectedShape);
-                    myCommandHistory.add(myMC);
-
                     //Find the shape we are trying to move in the drawList and Remove
                     //empty drawlist iterate through and add every shape to temp drawlist unless it matches
                     ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
 
                     for (IShape myShape : drawList) {
-                        if ((IShape) mySelectedShape != myShape) { //VALID COMPARISON?
+                        if ((IShape) mySelectedShape != myShape) {
                             tempDrawList.add(myShape);
                         }
                     }
@@ -138,35 +136,10 @@ public class JPaintController implements IJPaintController {
                     drawList = (ArrayList<IShape>) tempDrawList.clone();
                     System.out.println("DrawList size: " + drawList.size());
 
-                    Point origTopLeftCorner = BoundsUtility.calcTopLeftCorner(mySelectedShape.p1, mySelectedShape.p2);
                     int deltaX = BoundsUtility.calcDeltaX(pressedPoint, releasedPoint);
                     int deltaY = BoundsUtility.calcDeltaY(pressedPoint, releasedPoint);
 
-                    Point newTopLeftCorner = new Point(origTopLeftCorner.x + deltaX, origTopLeftCorner.y + deltaY);
-
-                    int shapeWidth = BoundsUtility.calcWidth(mySelectedShape.p1, mySelectedShape.p2);
-                    int shapeHeight = BoundsUtility.calcHeight(mySelectedShape.p1, mySelectedShape.p2);
-
-                    Point newBottomRightCorner = new Point(newTopLeftCorner.x + shapeWidth, newTopLeftCorner.y + shapeHeight);
-
-                    ShapeCommand shapeInNewPosition = null;
-                    //DrawTriangleCommand mySelectTriangle = (DrawTriangleCommand)mySelectedShape;
-                    if (mySelectedShape instanceof DrawTriangleCommand) {
-                        System.out.println("ITS A TRIANGLE");
-                        shapeInNewPosition = ShapeFactory.getDrawTriangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
-                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
-                    }
-                    if (mySelectedShape instanceof DrawRectangleCommand) {
-                        System.out.println("ITS A RECTANGLE");
-                        shapeInNewPosition = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
-                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
-                    }
-                    if (mySelectedShape instanceof DrawEllipseCommand) {
-                        System.out.println("ITS A ELLIPSE");
-                        shapeInNewPosition = ShapeFactory.getDrawEllipseCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
-                                mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
-                    }
-
+                    ShapeCommand shapeInNewPosition = MoveUtility.CreateShapeGivenMovement(drawList, paintCanvas, mySelectedShape, deltaX, deltaY);
 
                     drawList.add(shapeInNewPosition);
                     //selectedShapesList.remove(0);
@@ -175,36 +148,20 @@ public class JPaintController implements IJPaintController {
                 selectedShapesList = (ArrayList<ShapeCommand>)newSelectedShapesList.clone();
                 resetCanvas();
                 redraw();
-                //bug4: move multiple shapes at once
             }
         }
     }
 
-
-
     private void UndoButtonHandler(){
         resetCanvas();
         myCommandHistory.undo();
-        //REMOVE LAST SHAPE
-        int last = drawList.size();
-        if(last != 0){
-            drawList.remove(last-1);
-        }
         redraw();
     }
 
     private void RedoButtonHandler(){
         resetCanvas();
         myCommandHistory.redo();
-        //REMOVE LAST SHAPE
         redraw();
-    }
-
-    //ADDED
-    private void SelectButtonHandler(){
-        //call function
-        //if function returns empty array do nothing
-        //else
     }
 
     private void resetCanvas(){
