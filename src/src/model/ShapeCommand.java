@@ -103,6 +103,17 @@ public abstract class ShapeCommand implements IUndoable,IShape {
         }
     }
 
+    public boolean SCIsEqual(ShapeCommand otherSC){
+        Point myTopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
+        Point otherTopLeft = BoundsUtility.calcTopLeftCorner(otherSC.p1,otherSC.p2);
+        if(myTopLeft.x == otherTopLeft.x && myTopLeft.y == otherTopLeft.y){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public void drawMe() {
     }
 

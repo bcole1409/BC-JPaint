@@ -19,7 +19,7 @@ public class JPaintController implements IJPaintController {
 
     //the list of shapes that should be immediately drawn on screen the next instant
     //any shape movement should update the drawList so that the moved shape is in its final position in the drawList
-    private ArrayList<IShape> drawList;
+    public static ArrayList<IShape> drawList;
     private ArrayList<ShapeCommand> selectedShapesList;
 
     public JPaintController(IUiModule uiModule, IApplicationState applicationState, PaintCanvasBase MyPaintCanvas) {
@@ -117,9 +117,10 @@ public class JPaintController implements IJPaintController {
         if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
             //working with one shape now
             if(selectedShapesList.size() != 0) {
+                System.out.println("Executing New Move");
                 ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
 
-                MoveCommand myMC = new MoveCommand(drawList, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
+                MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
                 myCommandHistory.add(myMC);
 
                 for(ShapeCommand mySelectedShape : selectedShapesList) {
@@ -141,20 +142,28 @@ public class JPaintController implements IJPaintController {
 
                     ShapeCommand shapeInNewPosition = MoveUtility.CreateShapeGivenMovement(drawList, paintCanvas, mySelectedShape, deltaX, deltaY);
 
+                    System.out.println("JPC mySelectedShape: " + mySelectedShape.p1.x + ", " + mySelectedShape.p1.y + "      " + mySelectedShape.p2.x + ", " + mySelectedShape.p2.y);
+                    System.out.println("JPC shapeInNewPosition: " + shapeInNewPosition.p1.x + ", " + shapeInNewPosition.p1.y + "      " + shapeInNewPosition.p2.x + ", " + shapeInNewPosition.p2.y);
+
                     drawList.add(shapeInNewPosition);
                     //selectedShapesList.remove(0);
                     newSelectedShapesList.add(shapeInNewPosition);
                 }
+
                 selectedShapesList = (ArrayList<ShapeCommand>)newSelectedShapesList.clone();
                 resetCanvas();
                 redraw();
+                System.out.println("finished handling move: " + drawList.toString());
             }
         }
     }
 
     private void UndoButtonHandler(){
+        System.out.println("Undo Button Handler");
         resetCanvas();
-        myCommandHistory.undo();
+        myCommandHistory.undo(); //case: undo movement algorithm creates new shapes in order to work which automatically get drawn on creation
+        //so we need to reset the canvas again
+        resetCanvas();
         redraw();
     }
 
