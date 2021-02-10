@@ -1,5 +1,8 @@
 package model;
 
+import controller.DrawEllipseCommand;
+import controller.DrawRectangleCommand;
+import controller.DrawTriangleCommand;
 import model.interfaces.IShape;
 import model.interfaces.IUndoable;
 import view.interfaces.PaintCanvasBase;
@@ -104,11 +107,45 @@ public abstract class ShapeCommand implements IUndoable,IShape {
     }
 
     public boolean SCIsEqual(ShapeCommand otherSC){
+        boolean areSameShape = false;
+
+        if (this instanceof DrawRectangleCommand && otherSC instanceof DrawRectangleCommand) {
+           System.out.println("SC is equal its a Rectangle");
+           areSameShape = true;
+        }
+        if (this instanceof DrawTriangleCommand && otherSC instanceof DrawTriangleCommand) {
+            System.out.println("SC is equal its a Triangle");
+            areSameShape = true;
+        }
+
+        if (this instanceof DrawEllipseCommand && otherSC instanceof DrawEllipseCommand) {
+            System.out.println("SC is equal its a Ellipse");
+            areSameShape = true;
+        }
+
+        boolean sameTopLefts = false;
         Point myTopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
         Point otherTopLeft = BoundsUtility.calcTopLeftCorner(otherSC.p1,otherSC.p2);
         if(myTopLeft.x == otherTopLeft.x && myTopLeft.y == otherTopLeft.y){
-            return true;
+            sameTopLefts = true;
         }
+
+        boolean sameBottomRights = false;
+        Point myBottomRight = BoundsUtility.calcBottomRightCorner(p1,p2);
+        Point otherBottomRight= BoundsUtility.calcBottomRightCorner(otherSC.p1,otherSC.p2);
+        if(myBottomRight.x == otherBottomRight.x && myBottomRight.y == otherBottomRight.y){
+            sameBottomRights = true;
+        }
+
+        boolean sameColorsAndShading = false;
+        if(primaryColor == otherSC.primaryColor && secondaryColor == otherSC.secondaryColor && sShadingType == otherSC.sShadingType){
+            sameColorsAndShading = true;
+        }
+
+        if(areSameShape && sameTopLefts && sameBottomRights && sameColorsAndShading){ //Largely Untested
+           return true;
+       }
+
         else{
             return false;
         }

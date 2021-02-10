@@ -23,12 +23,19 @@ public class BoundsUtility  {
         return deltaY;
     }
 
-
     //p1 p2 should be pressed and released points
     public static Point calcTopLeftCorner(Point p1, Point p2){
         int x = Math.min(p1.x, p2.x);
         int y = Math.min(p1.y, p2.y);
         Point topLeft = new Point(x,y);
         return topLeft;
+    }
+
+    public static Point calcBottomRightCorner(Point p1, Point p2){ //UnTested
+        Point myTopLeft = calcTopLeftCorner(p1,p2);
+        int width = calcWidth(p1,p2);
+        int height = calcHeight(p1,p2);
+        Point myBottomRight = new Point(myTopLeft.x + width, myTopLeft.y + height);
+        return myBottomRight;
     }
 }

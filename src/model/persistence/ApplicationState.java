@@ -27,7 +27,9 @@ public class ApplicationState implements IApplicationState {
 
     @Override
     public void setActiveShape() {
+        System.out.println("preclick active shape type: " + activeShapeType);
         activeShapeType = uiModule.getDialogResponse(dialogProvider.getChooseShapeDialog());
+        System.out.println("active shape type: " + activeShapeType);
     }
 
     @Override

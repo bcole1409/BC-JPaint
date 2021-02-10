@@ -8,4 +8,6 @@ public class Point {
         this.x = myX;
         this.y = myY;
     }
+
+
 }
