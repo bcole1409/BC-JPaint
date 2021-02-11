@@ -3,6 +3,7 @@ package controller;
 import model.*;
 import model.Point;
 import model.interfaces.IApplicationState;
+import model.interfaces.ICommand;
 import model.interfaces.IShape;
 import view.EventName;
 import view.interfaces.IUiModule;
@@ -60,7 +61,7 @@ public class JPaintController implements IJPaintController {
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
                 drawList.add(myDRC);
-                myCommandHistory.add(myDRC);
+                myDRC.run();
                 //drawRectangle(pressedPoint, releasedPoint);
             }
 
@@ -68,14 +69,14 @@ public class JPaintController implements IJPaintController {
                 ShapeCommand myDTC = ShapeFactory.getDrawTriangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
                 drawList.add(myDTC);
-                myCommandHistory.add(myDTC);
+                myDTC.run();
             }
 
             if(applicationState.getActiveShapeType() == ShapeType.ELLIPSE){
                 ShapeCommand myDEC = ShapeFactory.getDrawEllipseCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
                 drawList.add(myDEC);
-                myCommandHistory.add(myDEC);
+                myDEC.run();
             }
         }
     }
@@ -98,8 +99,7 @@ public class JPaintController implements IJPaintController {
                     {
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
-                            myShape.debugGotSelected();
-                            //TODO Comment Out
+                            //myShape.debugGotSelected();
                         }
                         else{
                             tempUnselectShapes.add(myShape);
@@ -108,8 +108,7 @@ public class JPaintController implements IJPaintController {
                     unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
                 }
             }
-            //TODO Comment Out
-            System.out.println(selectedShapesList.size() + " Shapes Currently selected");
+            //System.out.println(selectedShapesList.size() + " Shapes Currently selected");
         }
     }
 
@@ -117,32 +116,37 @@ public class JPaintController implements IJPaintController {
         if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
             //working with one shape now
             if(selectedShapesList.size() != 0) {
-                System.out.println("Executing New Move");
+                //System.out.println("Executing New Move");
                 //ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
                 MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
 
                 myCommandHistory.add(myMC);
-                myMC.redo();
+                myMC.run();
+
                 selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
                 resetCanvas();
                 redraw();
-                System.out.println("finished handling move: " + drawList.toString());
+                //System.out.println("finished handling move: " + drawList.toString());
             }
         }
     }
 
     private void UndoButtonHandler(){
-        System.out.println("Undo Button Handler");
+        //System.out.println("Undo Button Handler");
         resetCanvas();
-        myCommandHistory.undo(); //case: undo movement algorithm creates new shapes in order to work which automatically get drawn on creation
+        ICommand cmdUndo = new UndoCommand();
+        cmdUndo.run();
+        //case: undo movement algorithm creates new shapes in order to work which automatically get drawn on creation
         //so we need to reset the canvas again
+
         resetCanvas();
         redraw();
     }
 
     private void RedoButtonHandler(){
         resetCanvas();
-        myCommandHistory.redo();
+        ICommand cmdRedo = new RedoCommand();
+        cmdRedo.run();
         redraw();
     }
 
@@ -159,31 +163,4 @@ public class JPaintController implements IJPaintController {
             shape.drawMe();
         }
     }
-
-    /*
-    public void drawTriangle(Point startingPoint, Point endingPoint){
-        System.out.println("NOT DONE");
-    }
-
-    public void drawEllipse(Point startingPoint, Point endingPoint){
-        System.out.println("NOT DONE");
-    }
-    */
 }
-        /*
-        // Filled in rectangle
-        Graphics2D graphics2d = paintCanvas.getGraphics2D();
-        graphics2d.setColor(Color.GREEN);
-        graphics2d.fillRect(12, 13, 200, 400);
-
-        // Outlined rectangle
-        graphics2d.setStroke(new BasicStroke(5));
-        graphics2d.setColor(Color.BLUE);
-        graphics2d.drawRect(12, 13, 200, 400);
-
-        // Selected Shape
-        Stroke stroke = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{9}, 0);
-        graphics2d.setStroke(stroke);
-        graphics2d.setColor(Color.BLACK);
-        graphics2d.drawRect(7, 8, 210, 410);
-         */

@@ -21,20 +21,21 @@ public class MoveUtility {
         ShapeCommand shapeInNewPosition = null;
         //DrawTriangleCommand mySelectTriangle = (DrawTriangleCommand)mySelectedShape;
         if (mySelectedShape instanceof DrawTriangleCommand) {
-            System.out.println("ITS A TRIANGLE");
+            //System.out.println("ITS A TRIANGLE");
             shapeInNewPosition = ShapeFactory.getDrawTriangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
                     mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
         }
         if (mySelectedShape instanceof DrawRectangleCommand) {
-            System.out.println("ITS A RECTANGLE");
+            //System.out.println("ITS A RECTANGLE");
             shapeInNewPosition = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
                     mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
         }
         if (mySelectedShape instanceof DrawEllipseCommand) {
-            System.out.println("ITS A ELLIPSE");
+            //System.out.println("ITS A ELLIPSE");
             shapeInNewPosition = ShapeFactory.getDrawEllipseCommand(drawList, paintCanvas, newTopLeftCorner, newBottomRightCorner, mySelectedShape.primaryColor,
                     mySelectedShape.secondaryColor, mySelectedShape.sShadingType);
         }
+
         return shapeInNewPosition;
     }
 }

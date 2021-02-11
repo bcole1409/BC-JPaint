@@ -29,7 +29,7 @@ public class ChooseShapeDialog implements IDialogChoice<ShapeType> {
 
     @Override
     public ShapeType getCurrentSelection() {
-        System.out.println("inside get current selection");
+        //System.out.println("inside get current selection");
         return applicationState.getActiveShapeType();
     }
 }

@@ -1,17 +1,13 @@
 package controller;
 
-import model.BoundsUtility;
-import model.MoveUtility;
-import model.Point;
-import model.ShapeCommand;
+import model.*;
+import model.interfaces.ICommand;
 import model.interfaces.IShape;
 import model.interfaces.IUndoable;
 import view.interfaces.PaintCanvasBase;
 import java.util.ArrayList;
 
-public class MoveCommand implements IUndoable {
-    //what is a move command?
-    //ex) in 1903 the green rect moved 50 units
+public class MoveCommand implements IUndoable, ICommand {
     public ArrayList<IShape> drawList;
     public PaintCanvasBase paintCanvas;
     JPaintController masterJPaintController;
@@ -22,12 +18,17 @@ public class MoveCommand implements IUndoable {
 
     public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point  myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes){
         this.masterJPaintController = myJPaintController;
-        //this.drawList = myJPaintController.drawList;
         this.paintCanvas = myPaintCanvas;
         this.pressedPoint = myPressedPoint;
         this.releasedPoint = myReleasedPoint;
         this.originalShapes = myOriginalShapes;
         this.JPCNewSelectedShapes = new ArrayList<ShapeCommand>();
+    }
+
+    @Override
+    public void run(){
+        redo();
+        CommandHistory.add(this);
     }
 
     @Override
@@ -87,4 +88,6 @@ public class MoveCommand implements IUndoable {
             JPCNewSelectedShapes.add(shapeInNewPosition);
         }
     }
+
+
 }

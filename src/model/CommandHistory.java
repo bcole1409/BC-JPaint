@@ -21,7 +21,6 @@ public class CommandHistory {
 			//coming off the undostack
 			IUndoable c = undoStack.pop();
 			redoStack.push(c);
-
 			//need to call this, goes to the drawCommand, undo yourself
 			c.undo();
 		}

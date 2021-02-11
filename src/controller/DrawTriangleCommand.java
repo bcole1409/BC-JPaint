@@ -15,7 +15,14 @@ public class DrawTriangleCommand extends ShapeCommand {
                               Point p2, ShapeColor myPrimaryColor, ShapeColor mySecondaryColor, ShapeShadingType myShadingType) {
 
         super(myDrawList,base,p1,p2,myPrimaryColor, mySecondaryColor, myShadingType);
+    }
+
+    @Override
+    public void run(){
+        super.run();
         drawMe();
+        //add to command history
+
     }
 
     @Override

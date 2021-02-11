@@ -3,6 +3,7 @@ package model;
 import controller.DrawEllipseCommand;
 import controller.DrawRectangleCommand;
 import controller.DrawTriangleCommand;
+import model.interfaces.ICommand;
 import model.interfaces.IShape;
 import model.interfaces.IUndoable;
 import view.interfaces.PaintCanvasBase;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 //Parent Class to all DrawShapeCommands
 //This means that shape command has all of the variables and functions that all shape commands share in common
-public abstract class ShapeCommand implements IUndoable,IShape {
+public abstract class ShapeCommand implements IUndoable,IShape, ICommand {
     public ArrayList<IShape> drawList;
     public Graphics2D myGraphics2D;
     public Point p1,p2;
@@ -30,13 +31,15 @@ public abstract class ShapeCommand implements IUndoable,IShape {
         sShadingType = myShadingType;
     }
 
-    @Override
+    public void run(){
+        CommandHistory.add(this);
+    }
+
     public void redo() {
         //Add yourself to the drawlist
         drawList.add(this);
     }
 
-    @Override
     public void undo() {
         //REMOVE LAST SHAPE
         int last = drawList.size();
@@ -110,16 +113,16 @@ public abstract class ShapeCommand implements IUndoable,IShape {
         boolean areSameShape = false;
 
         if (this instanceof DrawRectangleCommand && otherSC instanceof DrawRectangleCommand) {
-           System.out.println("SC is equal its a Rectangle");
+           //System.out.println("SC is equal its a Rectangle");
            areSameShape = true;
         }
         if (this instanceof DrawTriangleCommand && otherSC instanceof DrawTriangleCommand) {
-            System.out.println("SC is equal its a Triangle");
+            //System.out.println("SC is equal its a Triangle");
             areSameShape = true;
         }
 
         if (this instanceof DrawEllipseCommand && otherSC instanceof DrawEllipseCommand) {
-            System.out.println("SC is equal its a Ellipse");
+            //System.out.println("SC is equal its a Ellipse");
             areSameShape = true;
         }
 

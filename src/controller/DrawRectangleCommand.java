@@ -14,8 +14,16 @@ public class DrawRectangleCommand extends ShapeCommand {
     public DrawRectangleCommand(ArrayList<IShape> myDrawList, PaintCanvasBase base, Point p1,
                                 Point p2, ShapeColor myPrimaryColor, ShapeColor mySecondaryColor, ShapeShadingType myShadingType) {
 
-        super(myDrawList,base,p1,p2, myPrimaryColor, mySecondaryColor, myShadingType);
+        super(myDrawList,base, p1,p2, myPrimaryColor, mySecondaryColor, myShadingType);
+    }
+
+    @Override
+    public void run(){
+        super.run();
         drawMe();
+
+        //add to command history
+
     }
 
     @Override
@@ -39,7 +47,6 @@ public class DrawRectangleCommand extends ShapeCommand {
             super.setActiveColor(myGraphics2D, secondaryColor);
             myGraphics2D.setStroke(new BasicStroke(5));
             myGraphics2D.drawRect(TopLeft.x, TopLeft.y, width, height);
-            //X,Y IS THE TOP LEFT CORNER
         }
     }
 }
