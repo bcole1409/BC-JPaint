@@ -27,6 +27,7 @@ public class Main {
 
         paintCanvas.addMouseListener(MouseListenerInstance);
 
+
         // For example purposes only; remove all lines below from your final project.
         try {
             Thread.sleep(500);

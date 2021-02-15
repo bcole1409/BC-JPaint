@@ -20,8 +20,10 @@ public class JPaintController implements IJPaintController {
 
     //the list of shapes that should be immediately drawn on screen the next instant
     //any shape movement should update the drawList so that the moved shape is in its final position in the drawList
+    //ClipBoard used for storing selectedShapes when copy is active
     public static ArrayList<IShape> drawList;
-    private ArrayList<ShapeCommand> selectedShapesList;
+    public static ArrayList<ShapeCommand> selectedShapesList;
+    public static ArrayList<ShapeCommand> clipboard;
 
     public JPaintController(IUiModule uiModule, IApplicationState applicationState, PaintCanvasBase MyPaintCanvas) {
         this.uiModule = uiModule;
@@ -32,6 +34,7 @@ public class JPaintController implements IJPaintController {
         this.drawList = new ArrayList<IShape>();
         this.selectedShapesList = new ArrayList<ShapeCommand>();
         this.myCommandHistory = new CommandHistory();
+        this.clipboard = new ArrayList<ShapeCommand>();
     }
 
     @Override
@@ -47,6 +50,8 @@ public class JPaintController implements IJPaintController {
         uiModule.addEvent(EventName.CHOOSE_MOUSE_MODE, () -> applicationState.setActiveStartAndEndPointMode()); //LAMBDA function is an anonymous function
         uiModule.addEvent(EventName.UNDO, () -> UndoButtonHandler());
         uiModule.addEvent(EventName.REDO, () -> RedoButtonHandler());
+        uiModule.addEvent(EventName.COPY, () -> CopyButtonHandler());
+        uiModule.addEvent(EventName.PASTE, () -> PasteButtonHandler());
     }
 
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
@@ -99,7 +104,7 @@ public class JPaintController implements IJPaintController {
                     {
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
-                            //myShape.debugGotSelected();
+                            myShape.debugGotSelected();
                         }
                         else{
                             tempUnselectShapes.add(myShape);
@@ -108,7 +113,6 @@ public class JPaintController implements IJPaintController {
                     unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
                 }
             }
-            //System.out.println(selectedShapesList.size() + " Shapes Currently selected");
         }
     }
 
@@ -128,6 +132,31 @@ public class JPaintController implements IJPaintController {
                 redraw();
                 //System.out.println("finished handling move: " + drawList.toString());
             }
+        }
+    }
+
+    public void CopyButtonHandler(){
+        this.clipboard = new ArrayList<ShapeCommand>(); //create empty list
+        //check whether selected list is empty
+        if(selectedShapesList.size() != 0){
+            for(ShapeCommand shape : selectedShapesList){
+                clipboard.add(shape);
+            }
+        }
+    }
+
+    //TODO PASTE MODE
+    //PASTE SHOULD OFFSET ORIGINAL SHAPES
+    private void PasteButtonHandler() {
+        //check whether clipboard is empty
+        if (clipboard.size() != 0) {
+            //CREATED PASTE COMMAND
+            PasteCommand myPC = new PasteCommand(this, paintCanvas, clipboard, (ArrayList<ShapeCommand>)drawList.clone());
+            //ADD TO COMMAND HISTORY
+            myCommandHistory.add(myPC);
+            myPC.run();
+            //add to command history
+            //run command
         }
     }
 
@@ -164,3 +193,21 @@ public class JPaintController implements IJPaintController {
         }
     }
 }
+
+/*
+            //draw selected shape outline
+            for(ShapeCommand shape : selectedShapesList){
+                //create temp shape/Stroke
+                ShapeCommand tempShape = shape;
+                Stroke tempShapeStroke = new BasicStroke(3, BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_BEVEL, 1, new float[]{9}, 1);
+                paintCanvas.getGraphics2D().setStroke(tempShapeStroke);
+
+                System.out.println(shape.p1.x + " " + shape.p1.y + " " + (BoundsUtility.calcWidth(tempShape.p1,tempShape.p2)));
+                System.out.println(tempShape.p1.x + " " + tempShape.p1.y + " " + tempShape.p2.x + " " + tempShape.p2.x + " ");
+
+                paintCanvas.getGraphics2D().drawRect(tempShape.p1.x - 5,tempShape.p1.y - 5,
+                        BoundsUtility.calcWidth(tempShape.p1,tempShape.p2) + 10,BoundsUtility.calcHeight(tempShape.p1,tempShape.p2) + 10);
+            }
+            */
+//System.out.println(selectedShapesList.size() + " Shapes Currently selected");
