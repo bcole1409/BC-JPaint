@@ -16,7 +16,6 @@ public class JPaintController implements IJPaintController {
     private final IUiModule uiModule;
     private final IApplicationState applicationState;
     private final PaintCanvasBase paintCanvas;
-    private final CommandHistory myCommandHistory;
 
     //the list of shapes that should be immediately drawn on screen the next instant
     //any shape movement should update the drawList so that the moved shape is in its final position in the drawList
@@ -29,11 +28,8 @@ public class JPaintController implements IJPaintController {
         this.uiModule = uiModule;
         this.applicationState = applicationState;
         this.paintCanvas = MyPaintCanvas;
-
-        //new
         this.drawList = new ArrayList<IShape>();
         this.selectedShapesList = new ArrayList<ShapeCommand>();
-        this.myCommandHistory = new CommandHistory();
         this.clipboard = new ArrayList<ShapeCommand>();
     }
 
@@ -52,6 +48,7 @@ public class JPaintController implements IJPaintController {
         uiModule.addEvent(EventName.REDO, () -> RedoButtonHandler());
         uiModule.addEvent(EventName.COPY, () -> CopyButtonHandler());
         uiModule.addEvent(EventName.PASTE, () -> PasteButtonHandler());
+        uiModule.addEvent(EventName.DELETE, () -> DeleteButtonHandler());
     }
 
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
@@ -66,8 +63,7 @@ public class JPaintController implements IJPaintController {
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
                 drawList.add(myDRC);
-                myDRC.run();
-                //drawRectangle(pressedPoint, releasedPoint);
+                myDRC.run(); //ADDS COMMAND TO COMMAND HISTORY. THEN USES GRAPHICS2D TO ACTUALLY DRAW THE SHAPE
             }
 
             if(applicationState.getActiveShapeType() == ShapeType.TRIANGLE){
@@ -123,8 +119,6 @@ public class JPaintController implements IJPaintController {
                 //System.out.println("Executing New Move");
                 //ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
                 MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
-
-                myCommandHistory.add(myMC);
                 myMC.run();
 
                 selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
@@ -135,6 +129,7 @@ public class JPaintController implements IJPaintController {
         }
     }
 
+    //TODO I believe this to be finished
     public void CopyButtonHandler(){
         this.clipboard = new ArrayList<ShapeCommand>(); //create empty list
         //check whether selected list is empty
@@ -145,7 +140,6 @@ public class JPaintController implements IJPaintController {
         }
     }
 
-    //TODO PASTE MODE
     //PASTE SHOULD OFFSET ORIGINAL SHAPES
     private void PasteButtonHandler() {
         //check whether clipboard is empty
@@ -153,12 +147,20 @@ public class JPaintController implements IJPaintController {
             //CREATED PASTE COMMAND
             PasteCommand myPC = new PasteCommand(this, paintCanvas, clipboard, (ArrayList<ShapeCommand>)drawList.clone());
             //ADD TO COMMAND HISTORY
-            myCommandHistory.add(myPC);
             myPC.run();
-            //add to command history
-            //run command
         }
     }
+
+    private void DeleteButtonHandler() {
+        if (selectedShapesList.size() != 0) {
+            DeleteCommand myDC = new DeleteCommand(this, paintCanvas, selectedShapesList, (ArrayList<ShapeCommand>)drawList.clone());
+            myDC.run();
+            resetCanvas();
+            redraw();
+        }
+    }
+
+
 
     private void UndoButtonHandler(){
         //System.out.println("Undo Button Handler");
@@ -167,7 +169,6 @@ public class JPaintController implements IJPaintController {
         cmdUndo.run();
         //case: undo movement algorithm creates new shapes in order to work which automatically get drawn on creation
         //so we need to reset the canvas again
-
         resetCanvas();
         redraw();
     }

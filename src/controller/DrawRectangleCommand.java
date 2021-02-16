@@ -21,9 +21,7 @@ public class DrawRectangleCommand extends ShapeCommand {
     public void run(){
         super.run();
         drawMe();
-
         //add to command history
-
     }
 
     @Override

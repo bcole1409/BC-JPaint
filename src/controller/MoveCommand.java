@@ -64,10 +64,9 @@ public class MoveCommand implements IUndoable, ICommand {
     public void undo() {
         //1. we need to calc deltax, deltay
         //System.out.println("inside undo move command. My DrawList size is: " + drawList.size());
-        System.out.println("inside undo move command: " + masterJPaintController.drawList.toString());
+        //System.out.println("inside undo move command: " + masterJPaintController.drawList.toString());
         int deltax = BoundsUtility.calcDeltaX(pressedPoint,releasedPoint);
         int deltay = BoundsUtility.calcDeltaY(pressedPoint,releasedPoint);
-
         //clear selectedShapesList
         JPaintController.selectedShapesList = new ArrayList<ShapeCommand>();
 
