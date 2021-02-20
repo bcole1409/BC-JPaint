@@ -157,7 +157,7 @@ public abstract class ShapeCommand implements IUndoable,IShape, ICommand {
     public void drawMe() {
     }
 
-    //TEST
+    //TODO TEST (DELETE OR COMMENT OUT)
     public void debugGotSelected(){
         Point topLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
         myGraphics2D.fillOval(topLeft.x - 10, topLeft.y - 10, 20, 20); //X,Y IS THE TOP LEFT CORNER

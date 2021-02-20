@@ -62,6 +62,7 @@ public class JPaintController implements IJPaintController {
             if(applicationState.getActiveShapeType() == ShapeType.RECTANGLE){
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
+                //Wrap in proxy?
                 drawList.add(myDRC);
                 myDRC.run(); //ADDS COMMAND TO COMMAND HISTORY. THEN USES GRAPHICS2D TO ACTUALLY DRAW THE SHAPE
             }
@@ -100,8 +101,12 @@ public class JPaintController implements IJPaintController {
                     {
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
-                            myShape.debugGotSelected();
+                            //TODO PROXY OUTLINE SELECTED SHAPES
+                            //myShape.debugGotSelected(); //function only implemented in proxy
+                            ShapeCommandProxy mySCP = new ShapeCommandProxy(myShape);
+                            mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
                         }
+
                         else{
                             tempUnselectShapes.add(myShape);
                         }
@@ -120,21 +125,25 @@ public class JPaintController implements IJPaintController {
                 //ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
                 MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
                 myMC.run();
-
                 selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
                 resetCanvas();
                 redraw();
+                //loop to draw outline of selectedshapes
+                for(ShapeCommand selectedShape : selectedShapesList){
+                    ShapeCommandProxy mySCP = new ShapeCommandProxy(selectedShape);
+                    mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
+                }
                 //System.out.println("finished handling move: " + drawList.toString());
             }
         }
     }
 
-    //TODO I believe this to be finished
     public void CopyButtonHandler(){
         this.clipboard = new ArrayList<ShapeCommand>(); //create empty list
         //check whether selected list is empty
         if(selectedShapesList.size() != 0){
             for(ShapeCommand shape : selectedShapesList){
+                //create copy of selected shapes and save as "clipboard"
                 clipboard.add(shape);
             }
         }
@@ -159,8 +168,6 @@ public class JPaintController implements IJPaintController {
             redraw();
         }
     }
-
-
 
     private void UndoButtonHandler(){
         //System.out.println("Undo Button Handler");

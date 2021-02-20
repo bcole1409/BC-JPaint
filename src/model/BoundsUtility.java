@@ -38,4 +38,18 @@ public class BoundsUtility  {
         Point myBottomRight = new Point(myTopLeft.x + width, myTopLeft.y + height);
         return myBottomRight;
     }
+
+    public static int[] calcXPoints(Point p1, Point p2){
+        Point TopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
+        int width = BoundsUtility.calcWidth(p1, p2);
+        int[] answer = {TopLeft.x, TopLeft.x + width, TopLeft.x + width};
+        return answer;
+    }
+
+    public static int[] calcYPoints(Point p1, Point p2){
+        Point TopLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
+        int height = BoundsUtility.calcHeight(p1, p2);
+        int[] answer = {TopLeft.y, TopLeft.y, TopLeft.y + height};
+        return answer;
+    }
 }
