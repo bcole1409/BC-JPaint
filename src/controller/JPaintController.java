@@ -8,7 +8,6 @@ import model.interfaces.IShape;
 import view.EventName;
 import view.interfaces.IUiModule;
 import view.interfaces.PaintCanvasBase;
-import model.CommandHistory;
 import java.util.ArrayList;
 import java.awt.*;
 
@@ -60,9 +59,18 @@ public class JPaintController implements IJPaintController {
     public void handleMouseModeDraw(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.DRAW){
             if(applicationState.getActiveShapeType() == ShapeType.RECTANGLE){
+                //--2 instance of shapefactory--
+                //ShapeFactory myShapeFactory = new ShapeFactory();
+                //ShapeFactory myShapeFactory2 = new ShapeFactory();
+
+                //--1 instance of shapefactory--
+                //ShapeCommand myDRC = ShapeFactory.instance.getDrawRectangleCommand
+
+                ////--0 instance of shapefactory--
+
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
-                //Wrap in proxy?
+                //Wrap in proxy?`
                 drawList.add(myDRC);
                 myDRC.run(); //ADDS COMMAND TO COMMAND HISTORY. THEN USES GRAPHICS2D TO ACTUALLY DRAW THE SHAPE
             }

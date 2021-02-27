@@ -8,12 +8,14 @@ import java.awt.event.MouseListener;
 //Special mouse functions that get automatically called by the java programming language when
 //mouse events happen
 public class MyMouseListener implements MouseListener {
-        private IJPaintController controller; //a reference to JPaint controller a.k.a "the chef" of the program
+        public static final MyMouseListener MMLInstance = new MyMouseListener();
+
+        //TODO -- must set this externally in order for MML to work
+        public IJPaintController myController; //a reference to JPaint controller a.k.a "the chef" of the program
         private Point mousePressedPoint;
         private Point mouseReleasedPoint;
 
-        public MyMouseListener(IJPaintController myController) {
-                this.controller = myController;
+        private MyMouseListener() {
         }
 
         public void mousePressed(MouseEvent e) {
@@ -24,7 +26,7 @@ public class MyMouseListener implements MouseListener {
         public void mouseReleased(MouseEvent e) {
                 //System.out.println("mouse released: " + e.getX() + " " + e.getY());
                 mouseReleasedPoint = new Point(e.getX(),e.getY()); //save the point that the mouse released
-                controller.mouseReleasedController(mousePressedPoint, mouseReleasedPoint); //"The chef" receiving the information from
+                myController.mouseReleasedController(mousePressedPoint, mouseReleasedPoint); //"The chef" receiving the information from
                 //"the waiter" on the mouse is released.
         }
 
