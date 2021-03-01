@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 //Parent Class to all DrawShapeCommands
 //This means that shape command has all of the variables and functions that all shape commands share in common
-public abstract class ShapeCommand implements IUndoable,IShape, ICommand {
+public abstract class ShapeCommand implements IUndoable,IShape,ICommand {
     public ArrayList<IShape> drawList;
     public Graphics2D myGraphics2D;
     public Point p1,p2;

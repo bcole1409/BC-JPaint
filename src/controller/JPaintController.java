@@ -48,6 +48,8 @@ public class JPaintController implements IJPaintController {
         uiModule.addEvent(EventName.COPY, () -> CopyButtonHandler());
         uiModule.addEvent(EventName.PASTE, () -> PasteButtonHandler());
         uiModule.addEvent(EventName.DELETE, () -> DeleteButtonHandler());
+        uiModule.addEvent(EventName.GROUP, () -> GroupButtonHandler());
+        uiModule.addEvent(EventName.UNGROUP, () -> UngroupButtonHandler());
     }
 
     public void mouseReleasedController(Point pressedPoint, Point releasedPoint){
@@ -105,8 +107,7 @@ public class JPaintController implements IJPaintController {
             for(int x = topLeftCorner.x; x <= topLeftCorner.x + width; x++){
                 for(int y = topLeftCorner.y; y <= topLeftCorner.y + height; y++){
                     ArrayList<ShapeCommand> tempUnselectShapes = new ArrayList<ShapeCommand>();
-                    for (ShapeCommand myShape : unselectedShapes)
-                    {
+                    for (ShapeCommand myShape : unselectedShapes){
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
                             //TODO PROXY OUTLINE SELECTED SHAPES
@@ -193,6 +194,16 @@ public class JPaintController implements IJPaintController {
         ICommand cmdRedo = new RedoCommand();
         cmdRedo.run();
         redraw();
+    }
+
+    private void GroupButtonHandler(){
+        resetCanvas();
+        GroupCommand myGC = new GroupCommand((ArrayList<ShapeCommand>)selectedShapesList.clone(), paintCanvas.getGraphics2D());
+        myGC.run(); //Adds GC to CommandHistory
+        redraw();
+    }
+
+    private void UngroupButtonHandler(){
     }
 
     private void resetCanvas(){
