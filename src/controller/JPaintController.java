@@ -22,6 +22,7 @@ public class JPaintController implements IJPaintController {
     public static ArrayList<IShape> drawList;
     public static ArrayList<ShapeCommand> selectedShapesList;
     public static ArrayList<ShapeCommand> clipboard;
+    public static ArrayList<GroupCommand> listOfGroups;
 
     public JPaintController(IUiModule uiModule, IApplicationState applicationState, PaintCanvasBase MyPaintCanvas) {
         this.uiModule = uiModule;
@@ -30,6 +31,7 @@ public class JPaintController implements IJPaintController {
         this.drawList = new ArrayList<IShape>();
         this.selectedShapesList = new ArrayList<ShapeCommand>();
         this.clipboard = new ArrayList<ShapeCommand>();
+        this.listOfGroups = new ArrayList<GroupCommand>();
     }
 
     @Override
@@ -61,15 +63,6 @@ public class JPaintController implements IJPaintController {
     public void handleMouseModeDraw(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.DRAW){
             if(applicationState.getActiveShapeType() == ShapeType.RECTANGLE){
-                //--2 instance of shapefactory--
-                //ShapeFactory myShapeFactory = new ShapeFactory();
-                //ShapeFactory myShapeFactory2 = new ShapeFactory();
-
-                //--1 instance of shapefactory--
-                //ShapeCommand myDRC = ShapeFactory.instance.getDrawRectangleCommand
-
-                ////--0 instance of shapefactory--
-
                 ShapeCommand myDRC = ShapeFactory.getDrawRectangleCommand(drawList, paintCanvas, pressedPoint, releasedPoint, applicationState.getActivePrimaryColor(),
                         applicationState.getActiveSecondaryColor(), applicationState.getActiveShapeShadingType());
                 //Wrap in proxy?`
@@ -106,11 +99,14 @@ public class JPaintController implements IJPaintController {
 
             for(int x = topLeftCorner.x; x <= topLeftCorner.x + width; x++){
                 for(int y = topLeftCorner.y; y <= topLeftCorner.y + height; y++){
+
+                    //add shapes to selectedShapesList
                     ArrayList<ShapeCommand> tempUnselectShapes = new ArrayList<ShapeCommand>();
                     for (ShapeCommand myShape : unselectedShapes){
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
-                            //TODO PROXY OUTLINE SELECTED SHAPES
+
+                            //proxy to draw dashes around selectedShape
                             //myShape.debugGotSelected(); //function only implemented in proxy
                             ShapeCommandProxy mySCP = new ShapeCommandProxy(myShape);
                             mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
@@ -121,8 +117,24 @@ public class JPaintController implements IJPaintController {
                         }
                     }
                     unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
+
+
+                    //add groups to selectedShapesList
+                    for(GroupCommand myGC : listOfGroups){
+                        if(myGC.didCollideWithMe(x,y)){
+                            for(ShapeCommand groupMemberShape : myGC.groupMemberList) {
+                                if (!selectedShapesList.contains(groupMemberShape)) {
+                                    selectedShapesList.add(groupMemberShape);
+                                }
+                            }
+                            myGC.drawMe();
+                        }
+                    }
+
+
                 }
             }
+            System.out.println("selectedShapesList.size" + selectedShapesList.size());
         }
     }
 
@@ -197,13 +209,17 @@ public class JPaintController implements IJPaintController {
     }
 
     private void GroupButtonHandler(){
-        resetCanvas();
-        GroupCommand myGC = new GroupCommand((ArrayList<ShapeCommand>)selectedShapesList.clone(), paintCanvas.getGraphics2D());
-        myGC.run(); //Adds GC to CommandHistory
-        redraw();
+        if(selectedShapesList.size() > 0) {
+            resetCanvas();
+            GroupCommand myGC = new GroupCommand((ArrayList<ShapeCommand>) selectedShapesList.clone(), paintCanvas.getGraphics2D());
+            myGC.run(); //Adds GC to CommandHistory
+            listOfGroups.add(myGC);
+            redraw();
+        }
     }
 
     private void UngroupButtonHandler(){
+
     }
 
     private void resetCanvas(){
@@ -238,3 +254,11 @@ public class JPaintController implements IJPaintController {
             }
             */
 //System.out.println(selectedShapesList.size() + " Shapes Currently selected");
+
+//SINGLETON!!!
+//--2 instance of shapefactory--
+//ShapeFactory myShapeFactory = new ShapeFactory();
+//ShapeFactory myShapeFactory2 = new ShapeFactory();
+//--1 instance of shapefactory--
+//ShapeCommand myDRC = ShapeFactory.instance.getDrawRectangleCommand
+////--0 instance of shapefactory--

@@ -2,7 +2,6 @@ package controller;
 
 import model.BoundsUtility;
 import model.CommandHistory;
-import model.Point;
 import model.ShapeCommand;
 import model.interfaces.ICommand;
 import model.interfaces.IShape;
@@ -12,13 +11,14 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class GroupCommand implements IUndoable, IShape, ICommand{
-    public ArrayList<ShapeCommand> groupList;
+    public ArrayList<ShapeCommand> groupMemberList;
     public Graphics2D Graphics2D;
+    private Point topLeftPoint;
+    private Point bottomRightPoint;
 
-    public GroupCommand(ArrayList<ShapeCommand> myGroupList, Graphics2D myGraphics2D){
-        this.groupList = myGroupList;
+    public GroupCommand(ArrayList<ShapeCommand> myGroupMemberList, Graphics2D myGraphics2D){
+        this.groupMemberList = myGroupMemberList;
         this.Graphics2D = myGraphics2D;
-
     }
 
     @Override
@@ -35,9 +35,9 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         int maxY = Integer.MIN_VALUE;
 
         //find min/max XY
-        for(ShapeCommand shape : groupList){
-            int[] xPoints = BoundsUtility.calcXPoints(shape.p1, shape.p2); //technically used for calculating triangle xCoord but will work for our algo
-            int[] yPoints = BoundsUtility.calcYPoints(shape.p1, shape.p2); //technically used for calculating triangle yCoord but will work for our algo
+        for(ShapeCommand shape : groupMemberList){
+            int[] xPoints = BoundsUtility.calcXPoints(shape.p1, shape.p2); //technically used for calculating triangle xCoord but will work for algo
+            int[] yPoints = BoundsUtility.calcYPoints(shape.p1, shape.p2); //technically used for calculating triangle yCoord but will work for algo
             for(int i = 0; i < xPoints.length; i++){
                 if (xPoints[i] < minX){
                     minX = xPoints[i];
@@ -60,12 +60,17 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         maxX += 5;
         maxY += 5;
 
+        //used in didCollideWithMe
+        topLeftPoint = new Point(minX,minY);
+        bottomRightPoint = new Point(maxX,maxY);
+
         //draw New Outline
         Stroke stroke = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{9}, 0);
         Graphics2D.setStroke(stroke);
         Graphics2D.setColor(Color.BLACK);
         Graphics2D.drawRect(minX, minY, maxX - minX, maxY-minY);
     }
+
 
     @Override
     public void undo() {
@@ -75,6 +80,15 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
     @Override
     public void redo() {
 
+    }
+
+    public boolean didCollideWithMe(int x, int y){
+        if(x <= bottomRightPoint.x && x >= topLeftPoint.x){
+            if(y <= bottomRightPoint.y && y >= topLeftPoint.y){
+                return true;
+            }
+        }
+        return false;
     }
 }
 
