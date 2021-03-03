@@ -90,8 +90,10 @@ public class JPaintController implements IJPaintController {
         if(applicationState.getActiveMouseMode() == MouseMode.SELECT){
             resetCanvas();
             redraw();
+
             this.selectedShapesList = new ArrayList<ShapeCommand>(); //everytime user selects we clear the selection list
             ArrayList<ShapeCommand> unselectedShapes = (ArrayList<ShapeCommand>)drawList.clone(); //clone of drawList
+            ArrayList<GroupCommand> unselectedGroups = (ArrayList<GroupCommand>)listOfGroups.clone();
 
             Point topLeftCorner = BoundsUtility.calcTopLeftCorner(pressedPoint, releasedPoint);
             int width = BoundsUtility.calcWidth(pressedPoint, releasedPoint);
@@ -101,7 +103,7 @@ public class JPaintController implements IJPaintController {
                 for(int y = topLeftCorner.y; y <= topLeftCorner.y + height; y++){
 
                     //add shapes to selectedShapesList
-                    ArrayList<ShapeCommand> tempUnselectShapes = new ArrayList<ShapeCommand>();
+                    ArrayList<ShapeCommand> tempUnselectedShapes = new ArrayList<ShapeCommand>();
                     for (ShapeCommand myShape : unselectedShapes){
                         if(myShape.didCollideWithMe(x,y)){
                             selectedShapesList.add(myShape);
@@ -113,23 +115,32 @@ public class JPaintController implements IJPaintController {
                         }
 
                         else{
-                            tempUnselectShapes.add(myShape);
+                            tempUnselectedShapes.add(myShape);
                         }
                     }
-                    unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectShapes.clone();
+                    unselectedShapes = (ArrayList<ShapeCommand>)tempUnselectedShapes.clone();
 
 
                     //add groups to selectedShapesList
-                    for(GroupCommand myGC : listOfGroups){
+                    ArrayList<GroupCommand> tempUnselectedGroups = new ArrayList<GroupCommand>();
+                    for(GroupCommand myGC : unselectedGroups){
                         if(myGC.didCollideWithMe(x,y)){
+
                             for(ShapeCommand groupMemberShape : myGC.groupMemberList) {
-                                if (!selectedShapesList.contains(groupMemberShape)) {
+                                if (!selectedShapesList.contains(groupMemberShape)) { //FIX THIS
                                     selectedShapesList.add(groupMemberShape);
+                                }
+                                else{
+                                    System.out.println("Adding Fresh Group Member Shape" );
                                 }
                             }
                             myGC.drawMe();
                         }
+                        else{
+                            tempUnselectedGroups.add(myGC);
+                        }
                     }
+                    unselectedGroups = (ArrayList<GroupCommand>)tempUnselectedGroups.clone();
 
 
                 }
