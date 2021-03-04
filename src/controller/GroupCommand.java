@@ -24,6 +24,7 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
     public GroupCommand(ArrayList<ShapeCommand> myGroupMemberList, Graphics2D myGraphics2D){
         this.groupMemberList = myGroupMemberList;
         this.Graphics2D = myGraphics2D;
+        System.out.println("GroupCommand Created size is " + this.groupMemberList.size());
     }
 
     @Override

@@ -106,12 +106,17 @@ public class JPaintController implements IJPaintController {
                     ArrayList<ShapeCommand> tempUnselectedShapes = new ArrayList<ShapeCommand>();
                     for (ShapeCommand myShape : unselectedShapes){
                         if(myShape.didCollideWithMe(x,y)){
-                            selectedShapesList.add(myShape);
-
-                            //proxy to draw dashes around selectedShape
-                            //myShape.debugGotSelected(); //function only implemented in proxy
-                            ShapeCommandProxy mySCP = new ShapeCommandProxy(myShape);
-                            mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
+                            boolean shapeAlreadyInSSL = false;
+                            for(ShapeCommand testShape : selectedShapesList){
+                                if(testShape.SCIsEqual(myShape)) shapeAlreadyInSSL = true;
+                            }
+                            if(!shapeAlreadyInSSL) {
+                                selectedShapesList.add(myShape);
+                                //proxy to draw dashes around selectedShape
+                                //myShape.debugGotSelected(); //function only implemented in proxy
+                                ShapeCommandProxy mySCP = new ShapeCommandProxy(myShape);
+                                mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
+                            }
                         }
 
                         else{
@@ -127,11 +132,17 @@ public class JPaintController implements IJPaintController {
                         if(myGC.didCollideWithMe(x,y)){
 
                             for(ShapeCommand groupMemberShape : myGC.groupMemberList) {
-                                if (!selectedShapesList.contains(groupMemberShape)) { //FIX THIS
+                                boolean GMSAlreadyInSSL = false; //groupMemberShape is already in selectedShapesList
+                                System.out.println("131 SSL Size " + selectedShapesList.size());
+                                for(ShapeCommand testShape : selectedShapesList){
+                                    System.out.println("testing GMS in SSL ");
+                                    if(testShape.SCIsEqual(groupMemberShape)) GMSAlreadyInSSL = true;
+                                }
+                                if (!GMSAlreadyInSSL) {
                                     selectedShapesList.add(groupMemberShape);
                                 }
                                 else{
-                                    System.out.println("Adding Fresh Group Member Shape" );
+                                    System.out.println("GroupMemberShape already in SSL. Was Not ADDED!!!");
                                 }
                             }
                             myGC.drawMe();

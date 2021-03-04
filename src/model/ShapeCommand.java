@@ -20,6 +20,8 @@ public abstract class ShapeCommand implements IUndoable,IShape,ICommand {
     public ShapeColor secondaryColor;
     public ShapeShadingType sShadingType;
 
+    private ShapeType myShapeType = null; //only set when SCEquals is called
+
     public ShapeCommand(ArrayList<IShape> myDrawList, PaintCanvasBase base, Point p1,
                                 Point p2, ShapeColor myPrimaryColor, ShapeColor mySecondaryColor, ShapeShadingType myShadingType) {
         this.drawList = myDrawList;
@@ -114,15 +116,18 @@ public abstract class ShapeCommand implements IUndoable,IShape,ICommand {
 
         if (this instanceof DrawRectangleCommand && otherSC instanceof DrawRectangleCommand) {
            //System.out.println("SC is equal its a Rectangle");
-           areSameShape = true;
+            myShapeType = ShapeType.RECTANGLE;
+            areSameShape = true;
         }
         if (this instanceof DrawTriangleCommand && otherSC instanceof DrawTriangleCommand) {
             //System.out.println("SC is equal its a Triangle");
+            myShapeType = ShapeType.TRIANGLE;
             areSameShape = true;
         }
 
         if (this instanceof DrawEllipseCommand && otherSC instanceof DrawEllipseCommand) {
             //System.out.println("SC is equal its a Ellipse");
+            myShapeType = ShapeType.ELLIPSE;
             areSameShape = true;
         }
 
@@ -145,7 +150,8 @@ public abstract class ShapeCommand implements IUndoable,IShape,ICommand {
             sameColorsAndShading = true;
         }
 
-        if(areSameShape && sameTopLefts && sameBottomRights && sameColorsAndShading){ //Largely Untested
+        System.out.println("sameshape:" + areSameShape + " sametopleft:" + sameTopLefts + " samebottomright:" + sameBottomRights + " samecolorsandshading:" + sameColorsAndShading);
+        if(areSameShape && sameTopLefts && sameBottomRights && sameColorsAndShading){
            return true;
        }
 
@@ -162,4 +168,8 @@ public abstract class ShapeCommand implements IUndoable,IShape,ICommand {
         Point topLeft = BoundsUtility.calcTopLeftCorner(p1,p2);
         myGraphics2D.fillOval(topLeft.x - 10, topLeft.y - 10, 20, 20); //X,Y IS THE TOP LEFT CORNER
     }
+
+    //public String toString(){
+       // return myShapeType + "";
+    //}
 }
