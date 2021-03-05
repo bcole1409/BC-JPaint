@@ -162,13 +162,12 @@ public class JPaintController implements IJPaintController {
 
     public void handleMouseModeMove(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
-            //working with one shape now
             if(selectedShapesList.size() != 0) {
-                //System.out.println("Executing New Move");
-                //ArrayList<ShapeCommand> newSelectedShapesList = new ArrayList<ShapeCommand>();
                 MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
                 myMC.run();
                 selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
+                //UpdateListofGroups
+
                 resetCanvas();
                 redraw();
                 //loop to draw outline of selectedshapes
@@ -176,7 +175,7 @@ public class JPaintController implements IJPaintController {
                     ShapeCommandProxy mySCP = new ShapeCommandProxy(selectedShape);
                     mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
                 }
-                //System.out.println("finished handling move: " + drawList.toString());
+                //redraw group outlines
             }
         }
     }

@@ -14,6 +14,8 @@ public class MoveCommand implements IUndoable, ICommand {
     Point releasedPoint;
     ArrayList<ShapeCommand> originalShapes;
     ArrayList<ShapeCommand> JPCNewSelectedShapes;
+    ArrayList<GroupCommand> originalGroups;
+    ArrayList<GroupCommand> JPCNew
 
     public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point  myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes){
         this.masterJPaintController = myJPaintController;
@@ -35,7 +37,8 @@ public class MoveCommand implements IUndoable, ICommand {
         //reset list
         this.JPCNewSelectedShapes = new ArrayList<ShapeCommand>();
         for(ShapeCommand mySelectedShape : originalShapes) {
-            //Find the shape we are trying to move in the drawList and Remove
+            //step 1) Find the shape we are trying to move in the drawList and Remove
+
             //empty drawlist iterate through and add every shape to temp drawlist unless it matches
             ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
 
@@ -48,9 +51,11 @@ public class MoveCommand implements IUndoable, ICommand {
             masterJPaintController.drawList = (ArrayList<IShape>) tempDrawList.clone();
             //System.out.println("DrawList size: " + drawList.size());
 
+            //step 2) create shapeInNewPosition, then add it to the drawList and selectedShapesList
             int deltaX = BoundsUtility.calcDeltaX(pressedPoint, releasedPoint);
             int deltaY = BoundsUtility.calcDeltaY(pressedPoint, releasedPoint);
 
+            //Important: shapeInNewPosition is never added to CommandHistory
             ShapeCommand shapeInNewPosition = MoveUtility.CreateShapeGivenMovement(masterJPaintController.drawList, paintCanvas, mySelectedShape, deltaX, deltaY);
             //System.out.println("JPC mySelectedShape: " + mySelectedShape.p1.x + ", " + mySelectedShape.p1.y + "      " + mySelectedShape.p2.x + ", " + mySelectedShape.p2.y);
             //System.out.println("JPC shapeInNewPosition: " + shapeInNewPosition.p1.x + ", " + shapeInNewPosition.p1.y + "      " + shapeInNewPosition.p2.x + ", " + shapeInNewPosition.p2.y);
