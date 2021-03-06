@@ -163,19 +163,15 @@ public class JPaintController implements IJPaintController {
     public void handleMouseModeMove(Point pressedPoint, Point releasedPoint){
         if(applicationState.getActiveMouseMode() == MouseMode.MOVE){
             if(selectedShapesList.size() != 0) {
-                MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone());
+                MoveCommand myMC = new MoveCommand(this, paintCanvas, pressedPoint, releasedPoint, (ArrayList<ShapeCommand>)selectedShapesList.clone(),
+                        (ArrayList<GroupCommand>)listOfGroups.clone());
                 myMC.run();
-                selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
-                //UpdateListofGroups
+                //selectedShapesList = (ArrayList<ShapeCommand>)myMC.JPCNewSelectedShapes.clone();
+                //listOfGroups = (ArrayList<GroupCommand>)myMC.JPCNewListOfGroups.clone();
 
                 resetCanvas();
                 redraw();
-                //loop to draw outline of selectedshapes
-                for(ShapeCommand selectedShape : selectedShapesList){
-                    ShapeCommandProxy mySCP = new ShapeCommandProxy(selectedShape);
-                    mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
-                }
-                //redraw group outlines
+
             }
         }
     }
@@ -255,6 +251,19 @@ public class JPaintController implements IJPaintController {
         for(IShape shape : drawList){
             shape.drawMe();
         }
+
+        //loop to draw outline of selectedshapes
+        for(ShapeCommand selectedShape : selectedShapesList){
+            ShapeCommandProxy mySCP = new ShapeCommandProxy(selectedShape);
+            mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
+        }
+        //redraw group outlines
+        for(GroupCommand myGroup : listOfGroups){
+            if(myGroup.containsAtLeastOneShape(selectedShapesList)){
+                myGroup.drawMe();
+            }
+        }
+
     }
 }
 

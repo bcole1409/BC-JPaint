@@ -6,7 +6,6 @@ import model.ShapeCommand;
 import model.interfaces.ICommand;
 import model.interfaces.IShape;
 import model.interfaces.IUndoable;
-
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -94,6 +93,15 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         if(x <= bottomRightPoint.x && x >= topLeftPoint.x){
             if(y <= bottomRightPoint.y && y >= topLeftPoint.y){
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsAtLeastOneShape(ArrayList<ShapeCommand> testShapes){
+        for(ShapeCommand testShape : testShapes){
+            for(ShapeCommand memberShape : groupMemberList){
+                if(testShape.SCIsEqual(memberShape)) return true;
             }
         }
         return false;

@@ -34,7 +34,7 @@ public class DeleteCommand implements IUndoable, ICommand {
     public void redo() {
         //check to see whether selected shapes list is empty
         for (ShapeCommand mySelectedShape : selectedShapes) {
-            //Find the shape we are trying to move in the drawList and Remove
+            //Find the shape we are trying to DELETE in the drawList and Remove
             //empty drawlist iterate through and add every shape to temp drawlist unless it matches
             ArrayList<IShape> tempDrawList = new ArrayList<IShape>();
 

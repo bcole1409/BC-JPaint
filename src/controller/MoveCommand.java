@@ -15,15 +15,18 @@ public class MoveCommand implements IUndoable, ICommand {
     ArrayList<ShapeCommand> originalShapes;
     ArrayList<ShapeCommand> JPCNewSelectedShapes;
     ArrayList<GroupCommand> originalGroups;
-    ArrayList<GroupCommand> JPCNew
+    ArrayList<GroupCommand> JPCNewListOfGroups;
 
-    public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point  myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes){
+    public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point  myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes,
+                       ArrayList<GroupCommand> myOriginalGroups){
         this.masterJPaintController = myJPaintController;
         this.paintCanvas = myPaintCanvas;
         this.pressedPoint = myPressedPoint;
         this.releasedPoint = myReleasedPoint;
         this.originalShapes = myOriginalShapes;
         this.JPCNewSelectedShapes = new ArrayList<ShapeCommand>();
+        this.originalGroups = myOriginalGroups;
+        this.JPCNewListOfGroups = new ArrayList<GroupCommand>();
     }
 
     @Override
@@ -34,6 +37,9 @@ public class MoveCommand implements IUndoable, ICommand {
 
     @Override
     public void redo() {
+        int deltaX = BoundsUtility.calcDeltaX(pressedPoint, releasedPoint);
+        int deltaY = BoundsUtility.calcDeltaY(pressedPoint, releasedPoint);
+        //movement for selectedShapesList and drawList
         //reset list
         this.JPCNewSelectedShapes = new ArrayList<ShapeCommand>();
         for(ShapeCommand mySelectedShape : originalShapes) {
@@ -52,8 +58,7 @@ public class MoveCommand implements IUndoable, ICommand {
             //System.out.println("DrawList size: " + drawList.size());
 
             //step 2) create shapeInNewPosition, then add it to the drawList and selectedShapesList
-            int deltaX = BoundsUtility.calcDeltaX(pressedPoint, releasedPoint);
-            int deltaY = BoundsUtility.calcDeltaY(pressedPoint, releasedPoint);
+
 
             //Important: shapeInNewPosition is never added to CommandHistory
             ShapeCommand shapeInNewPosition = MoveUtility.CreateShapeGivenMovement(masterJPaintController.drawList, paintCanvas, mySelectedShape, deltaX, deltaY);
@@ -63,6 +68,24 @@ public class MoveCommand implements IUndoable, ICommand {
             //selectedShapesList.remove(0);
             JPCNewSelectedShapes.add(shapeInNewPosition);
         }
+
+        //bug????? fix movement for ssl and dl?
+        //movement for groups
+        this.JPCNewListOfGroups = new ArrayList<GroupCommand>();
+        for(GroupCommand myGroup : originalGroups){
+            if(myGroup.containsAtLeastOneShape(originalShapes)) { //ContainsAtLeastOneShape is a double for-loop
+                GroupCommand newMovedGroup = MoveUtility.CreateGroupGivenMovement(masterJPaintController.drawList, paintCanvas, myGroup, deltaX, deltaY);
+                newMovedGroup.drawMe(); //Only reason is to calculate TopLeft/BottomRight Corners. Don't care about actual drawing.
+                JPCNewListOfGroups.add(newMovedGroup);
+            }
+            else{
+                myGroup.drawMe();
+                JPCNewListOfGroups.add(myGroup);
+            }
+        }
+
+        masterJPaintController.selectedShapesList = (ArrayList<ShapeCommand>)JPCNewSelectedShapes.clone();
+        masterJPaintController.listOfGroups = (ArrayList<GroupCommand>)JPCNewListOfGroups.clone();
     }
 
     @Override

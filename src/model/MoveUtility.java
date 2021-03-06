@@ -3,12 +3,15 @@ package model;
 import controller.DrawEllipseCommand;
 import controller.DrawRectangleCommand;
 import controller.DrawTriangleCommand;
+import controller.GroupCommand;
 import model.interfaces.IShape;
 import view.interfaces.PaintCanvasBase;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class MoveUtility {
+
     public static ShapeCommand CreateShapeGivenMovement(ArrayList<IShape> drawList, PaintCanvasBase paintCanvas, ShapeCommand mySelectedShape, int deltaX, int deltaY){
         Point origTopLeftCorner = BoundsUtility.calcTopLeftCorner(mySelectedShape.p1, mySelectedShape.p2);
         Point newTopLeftCorner = new Point(origTopLeftCorner.x + deltaX, origTopLeftCorner.y + deltaY);
@@ -37,5 +40,15 @@ public class MoveUtility {
         }
 
         return shapeInNewPosition;
+    }
+
+    public static GroupCommand CreateGroupGivenMovement(ArrayList<IShape> drawList, PaintCanvasBase paintCanvas, GroupCommand originalGroup, int deltaX, int deltaY){
+        ArrayList<ShapeCommand>  newGroupMemberList = new ArrayList<ShapeCommand>();
+        for(ShapeCommand memberShape : originalGroup.groupMemberList){
+                ShapeCommand newMovedShape = CreateShapeGivenMovement(drawList,paintCanvas,memberShape, deltaX, deltaY);
+                newGroupMemberList.add(newMovedShape);
+        }
+        GroupCommand newMovedGroupCommand = new GroupCommand(newGroupMemberList, originalGroup.Graphics2D);
+        return newMovedGroupCommand;
     }
 }
