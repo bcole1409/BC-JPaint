@@ -17,7 +17,7 @@ public class MoveCommand implements IUndoable, ICommand {
     ArrayList<GroupCommand> originalGroups;
     ArrayList<GroupCommand> JPCNewListOfGroups;
 
-    public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point  myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes,
+    public MoveCommand(JPaintController myJPaintController, PaintCanvasBase myPaintCanvas, Point myPressedPoint, Point myReleasedPoint, ArrayList<ShapeCommand> myOriginalShapes,
                        ArrayList<GroupCommand> myOriginalGroups){
         this.masterJPaintController = myJPaintController;
         this.paintCanvas = myPaintCanvas;
@@ -135,7 +135,7 @@ public class MoveCommand implements IUndoable, ICommand {
         ArrayList<GroupCommand> newJPCListOfGroups = new ArrayList<GroupCommand>();
         for(GroupCommand myGroup : masterJPaintController.listOfGroups){
             if(myGroup.containsAtLeastOneShape(movedShapesList)){
-                GroupCommand newMovedGroup = MoveUtility.CreateGroupGivenMovement(masterJPaintController.drawList, paintCanvas, myGroup, deltaX, deltaY);
+                GroupCommand newMovedGroup = MoveUtility.CreateGroupGivenMovement(masterJPaintController.drawList, paintCanvas, myGroup, -deltaX, -deltaY);
                 newMovedGroup.drawMe(); //Only reason is to calculate TopLeft/BottomRight Corners. Don't care about actual drawing.
                 newJPCListOfGroups.add(newMovedGroup);
             }

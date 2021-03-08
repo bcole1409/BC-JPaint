@@ -28,8 +28,8 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
 
     @Override
     public void run() {
+        redo();
         CommandHistory.add(this);
-        drawMe();
     }
 
     @Override
@@ -80,13 +80,16 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
     }
 
     @Override
-    public void undo() {
-
+    public void redo() {
+        drawMe();
+        JPaintController.listOfGroups.add(this);
     }
 
     @Override
-    public void redo() {
+    public void undo() {
+        JPaintController.listOfGroups.remove(this); //bug does not work after movement
 
+        System.out.println("GroupCommand.undo LOG size " + JPaintController.listOfGroups.size());
     }
 
     public boolean didCollideWithMe(int x, int y){
@@ -103,6 +106,27 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
             for(ShapeCommand memberShape : groupMemberList){
                 if(testShape.SCIsEqual(memberShape)) return true;
             }
+        }
+        return false;
+    }
+
+    public boolean isEqual(GroupCommand otherGroup){
+        //check groupmemberlist.size() == otherGroup.size()
+        //&& every element of A is in B & every element of B is in A
+        if(groupMemberList.size() == otherGroup.groupMemberList.size()){
+            boolean otherContainsThisGroup = true;
+            for(ShapeCommand myShape : groupMemberList){
+                if(!otherGroup.contains(myShape)){
+                    return false;
+                }
+            }
+
+            for(ShapeCommand myOtherShape : otherGroup.groupMemberList){
+                if(!groupMemberList.contains(myOtherShape)){
+                    return false;
+                }
+            }
+            return true;
         }
         return false;
     }

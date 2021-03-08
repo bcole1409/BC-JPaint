@@ -48,7 +48,8 @@ public class MoveUtility {
                 ShapeCommand newMovedShape = CreateShapeGivenMovement(drawList,paintCanvas,memberShape, deltaX, deltaY);
                 newGroupMemberList.add(newMovedShape);
         }
-        GroupCommand newMovedGroupCommand = new GroupCommand(newGroupMemberList, originalGroup.Graphics2D);
+
+        GroupCommand newMovedGroupCommand = GroupFactory.getNewGroupCommand(newGroupMemberList, originalGroup.Graphics2D);
         return newMovedGroupCommand;
     }
 }

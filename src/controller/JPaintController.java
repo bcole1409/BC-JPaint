@@ -228,15 +228,18 @@ public class JPaintController implements IJPaintController {
     private void GroupButtonHandler(){
         if(selectedShapesList.size() > 0) {
             resetCanvas();
-            GroupCommand myGC = new GroupCommand((ArrayList<ShapeCommand>) selectedShapesList.clone(), paintCanvas.getGraphics2D());
+            GroupCommand myGC = GroupFactory.getNewGroupCommand((ArrayList<ShapeCommand>) selectedShapesList.clone(), paintCanvas.getGraphics2D());
             myGC.run(); //Adds GC to CommandHistory
-            listOfGroups.add(myGC);
+
             redraw();
         }
     }
 
     private void UngroupButtonHandler(){
-
+        if(selectedShapesList.size() > 0) {
+            //1) which groups are part of the ssl?
+            //2) remove these groups from the listofgroups
+        }
     }
 
     private void resetCanvas(){
