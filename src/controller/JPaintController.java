@@ -190,7 +190,7 @@ public class JPaintController implements IJPaintController {
     //PASTE SHOULD OFFSET ORIGINAL SHAPES
     private void PasteButtonHandler() {
         //check whether clipboard is empty
-        if (clipboard.size() != 0) {
+        if (clipboard.size() > 0) {
             //CREATED PASTE COMMAND
             PasteCommand myPC = new PasteCommand(this, paintCanvas, clipboard, (ArrayList<ShapeCommand>)drawList.clone());
             //ADD TO COMMAND HISTORY
@@ -199,8 +199,9 @@ public class JPaintController implements IJPaintController {
     }
 
     private void DeleteButtonHandler() {
-        if (selectedShapesList.size() != 0) {
-            DeleteCommand myDC = new DeleteCommand(this, paintCanvas, selectedShapesList, (ArrayList<ShapeCommand>)drawList.clone());
+        if (selectedShapesList.size() > 0) {
+            DeleteCommand myDC = new DeleteCommand(this, paintCanvas, selectedShapesList, (ArrayList<ShapeCommand>)drawList.clone(),
+                    (ArrayList<GroupCommand>)listOfGroups.clone());
             myDC.run();
             resetCanvas();
             redraw();
@@ -230,15 +231,25 @@ public class JPaintController implements IJPaintController {
             resetCanvas();
             GroupCommand myGC = GroupFactory.getNewGroupCommand((ArrayList<ShapeCommand>) selectedShapesList.clone(), paintCanvas.getGraphics2D());
             myGC.run(); //Adds GC to CommandHistory
-
             redraw();
         }
     }
 
     private void UngroupButtonHandler(){
-        if(selectedShapesList.size() > 0) {
+        if(selectedShapesList.size() > 0 && listOfGroups.size() > 0) {
             //1) which groups are part of the ssl?
             //2) remove these groups from the listofgroups
+            resetCanvas();
+            //derive listOfSelectedGroup
+            ArrayList<GroupCommand> selectedGroups = new ArrayList<GroupCommand>();
+            for(GroupCommand LOGgroup : listOfGroups){
+                if(LOGgroup.containsAtLeastOneShape(selectedShapesList)){
+                    selectedGroups.add(LOGgroup);
+                }
+            }
+            UngroupCommand myUC = GroupFactory.getNewUngroupCommand(selectedGroups);
+            myUC.run();
+            redraw();
         }
     }
 
@@ -260,6 +271,7 @@ public class JPaintController implements IJPaintController {
             ShapeCommandProxy mySCP = new ShapeCommandProxy(selectedShape);
             mySCP.drawMe(); //WARNING CAUSES SHAPE TO BE DRAWN A SECOND TIME ON TOP OF ITSELF
         }
+
         //redraw group outlines
         for(GroupCommand myGroup : listOfGroups){
             if(myGroup.containsAtLeastOneShape(selectedShapesList)){

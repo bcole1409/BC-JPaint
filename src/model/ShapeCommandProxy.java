@@ -4,7 +4,6 @@ import controller.DrawEllipseCommand;
 import controller.DrawRectangleCommand;
 import controller.DrawTriangleCommand;
 import model.interfaces.IShape;
-
 import java.awt.*;
 
 public class ShapeCommandProxy implements IShape {

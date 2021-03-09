@@ -9,21 +9,21 @@ import model.interfaces.IUndoable;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class GroupCommand implements IUndoable, IShape, ICommand{
-    public ArrayList<ShapeCommand> groupMemberList;
-    public Graphics2D Graphics2D;
-    private Point topLeftPoint;
-    private Point bottomRightPoint;
+public class UngroupCommand implements IUndoable, IShape, ICommand{
+    public ArrayList<GroupCommand> groupsToUngroup;
+    //public Graphics2D Graphics2D;
+    //private Point topLeftPoint;
+    //private Point bottomRightPoint;
 
-    private int minX = -1;
-    private int maxX = -1;
-    private int minY = -1;
-    private int maxY = -1;
+    //private int minX = -1;
+    //private int maxX = -1;
+    //private int minY = -1;
+    //private int maxY = -1;
 
-    public GroupCommand(ArrayList<ShapeCommand> myGroupMemberList, Graphics2D myGraphics2D){
-        this.groupMemberList = myGroupMemberList;
-        this.Graphics2D = myGraphics2D;
-        System.out.println("GroupCommand Created size is " + this.groupMemberList.size());
+    public UngroupCommand(ArrayList<GroupCommand> myGroupsToUngroup){
+        this.groupsToUngroup = myGroupsToUngroup;
+        //this.Graphics2D = myGraphics2D;
+        //System.out.println("GroupCommand Created size is " + this.groupMemberList.size());
     }
 
     @Override
@@ -33,7 +33,22 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
     }
 
     @Override
+    public void redo() {
+        for(GroupCommand myGroup : groupsToUngroup){
+            myGroup.undo();
+        }
+    }
+
+    @Override
+    public void undo() {
+        for(GroupCommand myGroup : groupsToUngroup){
+            myGroup.redo();
+        }
+    }
+
+    @Override
     public void drawMe() {
+        /*
         if(minX == -1 && maxX == -1 && minY == -1 && maxY == -1){
             minX = Integer.MAX_VALUE;
             minY = Integer.MAX_VALUE;
@@ -77,27 +92,9 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         Graphics2D.setStroke(stroke);
         Graphics2D.setColor(Color.BLACK);
         Graphics2D.drawRect(minX, minY, maxX - minX, maxY-minY);
+         */
     }
-
-    @Override
-    public void redo() {
-        drawMe();
-        JPaintController.listOfGroups.add(this);
-    }
-
-    @Override
-    public void undo() {
-        ArrayList<GroupCommand> tempListOfGroups =  new ArrayList<GroupCommand>();
-        for(GroupCommand myGroup : JPaintController.listOfGroups){
-            if(!myGroup.isEqual(this)){
-                tempListOfGroups.add(myGroup);
-                //JPaintController.listOfGroups.remove(myGroup); //bug does not work after movement
-            }
-        }
-        JPaintController.listOfGroups = tempListOfGroups;
-        //System.out.println("GroupCommand.undo LOG size " + JPaintController.listOfGroups.size());
-    }
-
+    /*
     public boolean didCollideWithMe(int x, int y){
         if(x <= bottomRightPoint.x && x >= topLeftPoint.x){
             if(y <= bottomRightPoint.y && y >= topLeftPoint.y){
@@ -106,7 +103,8 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         }
         return false;
     }
-
+    */
+   /*
     public boolean containsAtLeastOneShape(ArrayList<ShapeCommand> testShapes){
         for(ShapeCommand testShape : testShapes){
             for(ShapeCommand memberShape : groupMemberList){
@@ -140,6 +138,7 @@ public class GroupCommand implements IUndoable, IShape, ICommand{
         }
         return false;
     }
+    */
 }
 
 
