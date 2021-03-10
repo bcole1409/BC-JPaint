@@ -19,6 +19,7 @@ public class JPaintController implements IJPaintController {
     //the list of shapes that should be immediately drawn on screen the next instant
     //any shape movement should update the drawList so that the moved shape is in its final position in the drawList
     //ClipBoard used for storing selectedShapes when copy is active
+
     public static ArrayList<IShape> drawList;
     public static ArrayList<ShapeCommand> selectedShapesList;
     public static ArrayList<ShapeCommand> clipboard;
@@ -180,11 +181,13 @@ public class JPaintController implements IJPaintController {
         this.clipboard = new ArrayList<ShapeCommand>(); //create empty list
         //check whether selected list is empty
         if(selectedShapesList.size() != 0){
-            for(ShapeCommand shape : selectedShapesList){
+            clipboard = (ArrayList<ShapeCommand>) selectedShapesList.clone();
+        }
+        /*for(ShapeCommand shape : selectedShapesList){
                 //create copy of selected shapes and save as "clipboard"
                 clipboard.add(shape);
             }
-        }
+        */
     }
 
     //PASTE SHOULD OFFSET ORIGINAL SHAPES
@@ -192,7 +195,8 @@ public class JPaintController implements IJPaintController {
         //check whether clipboard is empty
         if (clipboard.size() > 0) {
             //CREATED PASTE COMMAND
-            PasteCommand myPC = new PasteCommand(this, paintCanvas, clipboard, (ArrayList<ShapeCommand>)drawList.clone());
+            PasteCommand myPC = new PasteCommand(this, paintCanvas, clipboard, (ArrayList<ShapeCommand>)drawList.clone(),
+                                                (ArrayList<GroupCommand>)listOfGroups.clone());
             //ADD TO COMMAND HISTORY
             myPC.run();
         }
